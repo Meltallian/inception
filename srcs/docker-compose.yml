@@ -1,0 +1,41 @@
+services:
+  nginx:
+    build: ./requirements/nginx/.
+    container_name: nginx
+    ports: 
+      - "8090:80" #this means that the port 8080 of the host is redirected to the port 80 inside the container
+    volumes:
+      - ./web:/var/www/html
+    networks:
+      inception:
+    depends_on:
+      - wordpress
+      - mariadb
+  wordpress:
+    build: ./requirements/wordpress/.
+    container_name: wp-php
+    depends_on:
+      - mariadb
+    volumes:
+      - ./web:/var/www/html
+    #This line maps the ./web directory on the host machine to the 
+    # /var/www/html directory inside the container. In that case here it is a bind mount
+    #, the volume is shared from the host to the docker and is not a named volume managed
+    #in the docker's storage area.
+    networks:
+      inception:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  mariadb:
+    build:  requirements/mariadb/.
+    container_name: mariadb
+    volumes:
+      - ./database:/var/lib/mysql
+    networks:
+      inception:
+
+networks:
+  inception:
