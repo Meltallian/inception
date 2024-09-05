@@ -3,14 +3,14 @@ services:
     build: ./requirements/nginx/.
     container_name: nginx
     ports: 
-      - "8090:80" #this means that the port 8080 of the host is redirected to the port 80 inside the container
+      - "8090:80" #this means that the port 8090 of the host is redirected to the port 80 inside the container
     volumes:
       - ./web:/var/www/html
     networks:
-      inception:
+      - inception
     depends_on:
       - wordpress
-      - mariadb
+    #   - mariadb
   wordpress:
     build: ./requirements/wordpress/.
     container_name: wp-php
@@ -23,19 +23,20 @@ services:
     #, the volume is shared from the host to the docker and is not a named volume managed
     #in the docker's storage area.
     networks:
-      inception:
+      - inception
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD", "curl", "-f", "http://localhost/wp-admin/install.php"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s  # Gives more time before starting health checks
   mariadb:
-    build:  requirements/mariadb/.
+    build:  ./requirements/mariadb/.
     container_name: mariadb
     volumes:
       - ./database:/var/lib/mysql
     networks:
-      inception:
+      - inception
 
 networks:
   inception:

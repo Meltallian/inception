@@ -1,6 +1,7 @@
 FROM debian:11
 
-RUN apt update && apt upgrade && apt install -y nginx 
+#&& apt-get upgrade
+RUN apt-get update && apt-get install -y nginx 
 
 #In the Dockerfile, the COPY instruction is used to copy files or directories 
 #from the host machine (where the Docker build command is run) into the Docker image.

@@ -12,13 +12,13 @@ FROM debian:11
 RUN apt-get update && apt-get install -y --no-install-recommends php-fpm \
 	-y php-mysqli \
 	curl \
-	ca-certificates
+#	ca-certificates
 
 #fix an error where directory was missing
 RUN	mkdir -p /run/php && chown www-data:www-data /run/php 
 
 
-COPY www.conf /etc/php/7.4/fpm/pool.d/
+COPY www.conf /etc/php/7.4/fpm/pool.d/.
 COPY script.sh .
 
 RUN chmod +x script.sh
