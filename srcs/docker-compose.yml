@@ -1,42 +1,61 @@
 services:
-  nginx:
-    build: ./requirements/nginx/.
-    container_name: nginx
-    ports: 
-      - "8090:80" #this means that the port 8090 of the host is redirected to the port 80 inside the container
+
+  mariadb:
+    build:  ./requirements/mariadb/.
+    container_name: mariadb
     volumes:
-      - ./web:/var/www/html
+      - database:/var/lib/mysql
     networks:
       - inception
-    depends_on:
-      - wordpress
-    #   - mariadb
+    restart: always
+
   wordpress:
     build: ./requirements/wordpress/.
     container_name: wp-php
     depends_on:
       - mariadb
     volumes:
-      - ./web:/var/www/html
+      - web:/var/www/html
     #This line maps the ./web directory on the host machine to the 
     # /var/www/html directory inside the container. In that case here it is a bind mount
     #, the volume is shared from the host to the docker and is not a named volume managed
     #in the docker's storage area.
     networks:
       - inception
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/wp-admin/install.php"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s  # Gives more time before starting health checks
-  mariadb:
-    build:  ./requirements/mariadb/.
-    container_name: mariadb
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost/wp-admin/install.php"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 60s  # Gives more time before starting health checks
+    restart: always
+
+  nginx:
+    build: ./requirements/nginx/.
+    container_name: nginx
+    ports: 
+      - "8090:80" #this means that the port xxx: of the host is redirected to the port :xxx inside the container
     volumes:
-      - ./database:/var/lib/mysql
+      - web:/var/www/html
     networks:
       - inception
+    restart: always #restart to always keep the service in case of any unexpected errors
+    depends_on:
+      - wordpress
+    #   - mariadb
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost/"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 60s  # Gives more time before starting health checks
+
+volumes:
+  database:
+    driver: local
+  web:
+    driver: local
+
 
 networks:
   inception:

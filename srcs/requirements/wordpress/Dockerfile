@@ -12,7 +12,7 @@ FROM debian:11
 RUN apt-get update && apt-get install -y --no-install-recommends php-fpm \
 	-y php-mysqli \
 	curl \
-#	ca-certificates
+	ca-certificates
 
 #fix an error where directory was missing
 RUN	mkdir -p /run/php && chown www-data:www-data /run/php 

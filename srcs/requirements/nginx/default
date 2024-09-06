@@ -16,9 +16,9 @@
 # Please see /usr/share/doc/nginx-doc/examples/ for more detailed examples.
 ##
 
-upstream wordpress {
-    server wp-php:80;  # Assuming WordPress is listening on port 80
-}
+# upstream wordpress {
+#     server wp-php:80;  # Assuming WordPress is listening on port 80
+# }
 
 # Default server configuration
 #

@@ -1,5 +1,8 @@
 #!/bin/bash
-mkdir -p /var/www/html #si le dossier existe pas
+if [ ! -d "/var/www/html" ]; then #si le dossier existe pas
+  mkdir -p /var/www/html
+fi
+
 cd /var/www/html
 
 curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
