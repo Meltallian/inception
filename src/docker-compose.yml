@@ -52,6 +52,10 @@ services:
       -mariadb:/var/lib/mysql
     env_file:
       -.env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PWD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
     networks:
       -inception
     restart: always
