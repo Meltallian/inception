@@ -4,15 +4,21 @@ volumes:
     driver: local
     driver_opts:
       device: /home/jbidaux/data/wordpress
-      o: bind # the docker can read a write a parcel of data located in the host
+      # device: /home/jbidaux/Documents/inception/src/wordpress
+      # device: /media/sf_inception/wordpress
+      o: bind
       type: none
   mariadb:
     name: mariadb
     driver: local
     driver_opts:
       device: /home/jbidaux/data/mariadb
+      # device: /home/jbidaux/Documents/inception/src/mariadb
+      # device: /media/sf_inception/mariadb
       o: bind
       type: none
+
+#device: /home/jbidaux/data/mariadb
 
 networks:
   inception:
@@ -21,41 +27,41 @@ networks:
 services:
   nginx:
     container_name: nginx
-    build: ./requirements/nginx/.
+    build: ./requirements/nginx/
     ports:
-      -"443:443"
+      - "8070:8070"
     depends_on:
-      -wordpress
+      - wordpress
     volumes:
-      -wordpress:/var/www/html #specify name of the volume that is mounted to location /var/www/html
+      - wordpress:/var/www/html
     env_file:
-      -.env
+      - .env
     networks:
-      -inception
+      - inception
     restart: always
+
   wordpress:
     container_name: wordpress
-    build: ./requirements/wordpress/.
+    build: ./requirements/wordpress/
     depends_on:
-      -mariadb
+      - mariadb
     volumes:
-      -wordpress:/var/www/html
+      - wordpress:/var/www/html
     env_file:
-      -.env
+      - .env
     networks:
-      -inception
+      - inception
     restart: always
+
   mariadb:
+    build: ./requirements/mariadb/
     container_name: mariadb
-    build: ./requirements/mariadb/.
+    # ports:
+    #   - "3306:3306"
     volumes:
-      -mariadb:/var/lib/mysql
+      - mariadb:/var/lib/mysql
     env_file:
-      -.env
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PWD}
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
+      - .env
     networks:
-      -inception
+      - inception
     restart: always
