@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# while ! mariadb -h$WP_HOST -u$DB_USER -p$DB_PWD $DB_NAME &>/dev/null; do
+# while ! mariadb -h$WP_HOST -u$DB_USER -p$DB_PWD $DB_NAME & do
 # 	sleep 3
 # done
-
+sleep 20
 # echo "Database Name: $DB_NAME"
 # echo "Database User: $DB_USER"
 # echo "Database Password: $DB_PWD"
@@ -12,6 +12,11 @@
 # create directory to use in nginx container later and also to setup the wordpress conf
 mkdir -p /var/www/
 mkdir -p /var/www/html
+# chown -R www-data:www-data /var/www/html #permission issue
+# find /var/www/html -type d -exec chmod 755 {} \; #permission issue
+# find /var/www/html -type f -exec chmod 644 {} \; #permission issue
+
+
 
 cd /var/www/html
 
@@ -32,18 +37,18 @@ mv wp-cli.phar /usr/local/bin/wp
 # downloads the latest version of WordPress to the current directory. The --allow-root flag allows the command to be run as the root user, which is necessary if you are logged in as the root user or if you are using WP-CLI with a system-level installation of WordPress.
 wp core download --allow-root
 
-mv /var/www/html/wp-config-sample.php /var/www/html/wp-config.php #weird
+mv /wp-config.php ./wp-config.php #weird
 
 # change the those lines in wp-config.php file to connect with database
 
-#it seems those aren't needed since it's already dynamically set there
-sed -i -r "s/db1/$DB_NAME/1"   wp-config.php
-sed -i -r "s/user/$DB_USER/1"  wp-config.php
-sed -i -r "s/pwd/$DB_PWD/1"    wp-config.php
+# #it seems those aren't needed since it's already dynamically set there
+# sed -i -r "s/db1/$DB_NAME/1"   wp-config.php
+# sed -i -r "s/user/$DB_USER/1"  wp-config.php
+# sed -i -r "s/pwd/$DB_PWD/1"    wp-config.php
 
-#line 32 #(to connect with mariadb database) seems useless aswell
-sed -i -r "s/localhost/mariadb/1"    wp-config.php  
-# sed -i -r "s/localhost/mariadb/g"    wp-config.php  
+# #line 32 #(to connect with mariadb database) seems useless aswell
+# sed -i -r "s/localhost/mariadb/1"    wp-config.php  
+# # sed -i -r "s/localhost/mariadb/g"    wp-config.php  
 
 # installs WordPress and sets up the basic configuration for the site. The --url option specifies the URL of the site, --title sets the site's title, --admin_user and --admin_password set the username and password for the site's administrator account, and --admin_email sets the email address for the administrator. The --skip-email flag prevents WP-CLI from sending an email to the administrator with the login details.
 wp core install --url=$DOMAIN_NAME/ --title=$WP_TITLE --admin_user=$WP_ADMIN_USR --admin_password=$WP_ADMIN_PWD --admin_email=$WP_ADMIN_EMAIL --skip-email --allow-root

@@ -40,7 +40,7 @@ bind-address            = 0.0.0.0 #jbidaux change so any network can connect to 
 # This replaces the startup script and checks MyISAM tables if needed
 # the first time they are touched
 #myisam_recover_options = BACKUP
-#max_connections        = 100
+max_connections        = 200
 #table_cache            = 64
 
 #

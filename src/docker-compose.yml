@@ -3,18 +3,20 @@ volumes:
     name: wordpress
     driver: local
     driver_opts:
-      device: /home/jbidaux/data/wordpress
+      # device: /home/jbidaux/data/wordpress
       # device: /home/jbidaux/Documents/inception/src/wordpress
       # device: /media/sf_inception/wordpress
+      device: /home/jeremie/wordpress
       o: bind
       type: none
-  mariadb:
+  mariadb-data:
     name: mariadb
     driver: local
     driver_opts:
-      device: /home/jbidaux/data/mariadb
+      # device: /home/jbidaux/data/mariadb
       # device: /home/jbidaux/Documents/inception/src/mariadb
       # device: /media/sf_inception/mariadb
+      device: /home/jeremie/mariadb
       o: bind
       type: none
 
@@ -58,8 +60,8 @@ services:
     container_name: mariadb
     # ports:
     #   - "3306:3306"
-    volumes:
-      - mariadb:/var/lib/mysql
+    # volumes:
+    #   - mariadb-data:/var/lib/mysql
     env_file:
       - .env
     networks:

@@ -1,70 +1,84 @@
-# #!/bin/sh
-# if [ ! -d "/run/mysqld" ]; then
-# 	mkdir -p /run/mysqld
-# 	chown -R mysql:mysql /run/mysqld
-# fi
+#!/bin/sh
+rm -rf /var/lib/mysql
+if [ ! -d "/run/mysqld" ]; then
 
-# if [ ! -d "/var/lib/mysql/mysql" ]; then
-# 	chown -R mysql:mysql /var/lib/mysql
+	mkdir -p /run/mysqld
+	chown -R mysql:mysql /run/mysqld #to ensure proper ownership
+fi
 
-# 	# service mariadb start
+if [ ! -d "/var/lib/mysql/$DB_NAME" ]; then
+	mkdir -p /var/lib/mysql
+	chown -R mysql:mysql /var/lib/mysql
+	echo "MAIS OUI LE SANG"
+	# service mariadb start
 
-# 	mysql_install_db --basedir=/usr --datadir=/var/lib/mysql --user=mysql -rpm > dev/null
+	mysql_install_db --datadir=/var/lib/mysql --user=mysql  #initialize the data directory
 
+	echo "CREATE DATABASE IF NOT EXISTS $DB_NAME ;" > db1.sql #populate the database with sql commands
+	echo "CREATE USER IF NOT EXISTS '$DB_USER'@'%' IDENTIFIED BY '$DB_PWD' ;" >> db1.sql
+	echo "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%';" >> db1.sql
+	echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '12345' ;" >> db1.sql
+	echo "FLUSH PRIVILEGES;" >> db1.sql
 
-# 	echo "CREATE DATABASE IF NOT EXISTS $DB_NAME ;" > db1.sql
-# 	echo "CREATE USER IF NOT EXISTS '$DB_USER'@'%' IDENTIFIED BY '$DB_PWD' ;" >> db1.sql
-# 	echo "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%';" >> db1.sql
-# 	echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '12345' ;" >> db1.sql
-# 	echo "FLUSH PRIVILEGES;" >> db1.sql
+	mysqld --datadir=/var/lib/mysql --user=mysql &
+	sleep 5
+	mysql < db1.sql
+	# chown -R mysql:mysql /var/lib/mysql
+	sleep 3
+	kill $(cat /run/mysqld/mysqld.pid)
+fi
 
-# 	# kill $(cat /var/run/mysqld/mysqld.pid)
-# 	mysqld --user=mysql --bootstrap < db1.sql
-# 	# mysql < db1.sql
-# fi
+# sleep infinity
 
-# exec mysqld --user=mysql --console
+exec mysqld --datadir=/var/lib/mysql --user=mysql
+
 
 #!/bin/sh
 
-if [ ! -d "/run/mysqld" ]; then
-    mkdir -p /run/mysqld
-    chown -R mysql:mysql /run/mysqld
-fi
+# echo "Starting mariadb....."
 
-if [ ! -d "/var/lib/mysql/mysql" ]; then
+# if [ ! -d "/run/mysqld" ]; then
+# 	echo "creating mysql runner"
+#     mkdir -p /run/mysqld
+#     chown -R mysql:mysql /run/mysqld
+# fi
 
-    chown -R mysql:mysql /var/lib/mysql
+# if [ ! -d "/var/lib/mysql/mysql" ]; then
+# 	echo "Initializing mysql"
+# 	mkdir -p /var/lib/mysql
+#     chown -R mysql:mysql /var/lib/mysql
 
-    # init database
-    mysql_install_db --basedir=/usr --datadir=/var/lib/mysql --user=mysql --rpm > /dev/null
+#     # init database provoque peutetre une erreur qui mene a un restart.
+#     mysql_install_db --basedir=/usr --datadir=/var/lib/mysql --user=mysql --rpm > /dev/null
 
-    tfile=mktemp
-    if [ ! -f "$tfile" ]; then
-        return 1
-    fi
+# 	echo "Mysql initialised"
+    
+# 	cat << EOF > db.db
+# USE mysql;
+# FLUSH PRIVILEGES;
 
-    # https://stackoverflow.com/questions/10299148/mysql-error-1045-28000-access-denied-for-user-billlocalhost-using-passw
-    cat << EOF > $tfile
-USE mysql;
-FLUSH PRIVILEGES;
+# DELETE FROM    mysql.user WHERE User='';
+# DROP DATABASE test;
+# DELETE FROM mysql.db WHERE Db='test';
+# DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
 
-DELETE FROM    mysql.user WHERE User='';
-DROP DATABASE test;
-DELETE FROM mysql.db WHERE Db='test';
-DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+# ALTER USER 'root'@'localhost' IDENTIFIED BY '12345';
 
-ALTER USER 'root'@'localhost' IDENTIFIED BY '12345';
+# CREATE DATABASE $DB_NAME CHARACTER SET utf8 COLLATE utf8_general_ci;
+# CREATE USER '$DB_USER'@'%' IDENTIFIED by '$DB_PWD';
+# GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%';
 
-CREATE DATABASE $DB_NAME CHARACTER SET utf8 COLLATE utf8_general_ci;
-CREATE USER '$DB_USER'@'%' IDENTIFIED by '$DB_PWD';
-GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%';
+# FLUSH PRIVILEGES;
+# EOF
+# #     # run init.sql
+#     # /usr/bin/mysqld --user=mysql --bootstrap < db.db
+# # 	echo "Mysql booted"
 
-FLUSH PRIVILEGES;
-EOF
-    # run init.sql
-    /usr/bin/mysqld --user=mysql --bootstrap < $tfile
-    rm -f $tfile
-fi
+# #     rm -f $tfile
+# fi 
 
-exec /usr/bin/mysqld --user=mysql --console
+# echo "Runing mysql"
+
+# exec /usr/bin/mysqld --user=mysql --console
+#fonctionne jusqua /usr/bin/mysqld mais exit 0 pour une raison inconnue
+# sleep infinity
