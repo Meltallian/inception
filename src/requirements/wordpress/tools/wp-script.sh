@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -x
 # while ! mariadb -h$WP_HOST -u$DB_USER -p$DB_PWD $DB_NAME & do
 # 	sleep 3
 # done
@@ -8,11 +8,15 @@ sleep 20
 # echo "Database User: $DB_USER"
 # echo "Database Password: $DB_PWD"
 # echo "Database Host: $DB_HOST"
-
+echo "----------- CHECK CHECK ------------"
+echo "----------- CHECK CHECK ------------"
+echo "----------- CHECK CHECK ------------"
+echo "----------- CHECK CHECK ------------"
+echo "----------- CHECK CHECK ------------"
 # create directory to use in nginx container later and also to setup the wordpress conf
 mkdir -p /var/www/
 mkdir -p /var/www/html
-# chown -R www-data:www-data /var/www/html #permission issue
+
 # find /var/www/html -type d -exec chmod 755 {} \; #permission issue
 # find /var/www/html -type f -exec chmod 644 {} \; #permission issue
 
@@ -21,7 +25,7 @@ mkdir -p /var/www/html
 cd /var/www/html
 
 # remove all the wordpress files if there is something from the volumes to install it again
-rm -rf *
+# rm -rf *
 
 # The commands are for installing and using the WP-CLI tool.
 
@@ -41,18 +45,18 @@ mv /wp-config.php ./wp-config.php #weird
 
 # change the those lines in wp-config.php file to connect with database
 
-# #it seems those aren't needed since it's already dynamically set there
-# sed -i -r "s/db1/$DB_NAME/1"   wp-config.php
-# sed -i -r "s/user/$DB_USER/1"  wp-config.php
-# sed -i -r "s/pwd/$DB_PWD/1"    wp-config.php
+#it seems those aren't needed since it's already dynamically set there
+sed -i -r "s/ma_data_base/$DB_NAME/1" wp-config.php
+sed -i -r "s/mon_user/$DB_USER/1" wp-config.php
+sed -i -r "s/mon_password/$DB_PWD/1" wp-config.php
 
 # #line 32 #(to connect with mariadb database) seems useless aswell
-# sed -i -r "s/localhost/mariadb/1"    wp-config.php  
+sed -i -r "s/mon_host/mariadb:3306/1" wp-config.php  
 # # sed -i -r "s/localhost/mariadb/g"    wp-config.php  
 
 # installs WordPress and sets up the basic configuration for the site. The --url option specifies the URL of the site, --title sets the site's title, --admin_user and --admin_password set the username and password for the site's administrator account, and --admin_email sets the email address for the administrator. The --skip-email flag prevents WP-CLI from sending an email to the administrator with the login details.
 wp core install --url=$DOMAIN_NAME/ --title=$WP_TITLE --admin_user=$WP_ADMIN_USR --admin_password=$WP_ADMIN_PWD --admin_email=$WP_ADMIN_EMAIL --skip-email --allow-root
-
+# wp core install --url=jbidaux.42.fr/ --title=$WP_TITLE --admin_user=$WP_ADMIN_USR --admin_password=$WP_ADMIN_PWD --admin_email=$WP_ADMIN_EMAIL --skip-email --allow-root
 # creates a new user account with the specified username, email address, and password. The --role option sets the user's role to author, which gives the user the ability to publish and manage their own posts.
 wp user create $WP_USR $WP_EMAIL --role=author --user_pass=$WP_PWD --allow-root
 
@@ -66,10 +70,18 @@ wp theme install astra --activate --allow-root
 # uses the sed command to modify the www.conf file in the /etc/php/7.3/fpm/pool.d directory. The s/listen = \/run\/php\/php7.3-fpm.sock/listen = 9000/g command substitutes the value 9000 for /run/php/php7.3-fpm.sock throughout the file. This changes the socket that PHP-FPM listens on from a Unix domain socket to a TCP port.
 sed -i 's/listen = \/run\/php\/php7.4-fpm.sock/listen = 9000/g' /etc/php/7.4/fpm/pool.d/www.conf
 
+sed -i 's/error_log = .*/error_log = \/var\/log\/php_errors.log/g' /etc/php/7.4/fpm/php.ini #to read error log
+
+
 # creates the /run/php directory, which is used by PHP-FPM to store Unix domain sockets.
 mkdir /run/php
 
+#added
+# chmod 777 -R /etc/php/7.4/fpm
+# sed -i 's/variables_order = "GPCS"/variables_order = "EGPCS"/' /etc/php/7.4/fpm/php.ini
 
+
+chmod -R 777 /var/www/html #permission issue
 #wp redis enable --allow-root for performance
 
 

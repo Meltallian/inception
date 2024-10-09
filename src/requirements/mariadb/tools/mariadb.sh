@@ -1,5 +1,5 @@
 #!/bin/sh
-rm -rf /var/lib/mysql
+# rm -rf /var/lib/mysql
 if [ ! -d "/run/mysqld" ]; then
 
 	mkdir -p /run/mysqld
@@ -17,7 +17,7 @@ if [ ! -d "/var/lib/mysql/$DB_NAME" ]; then
 	echo "CREATE DATABASE IF NOT EXISTS $DB_NAME ;" > db1.sql #populate the database with sql commands
 	echo "CREATE USER IF NOT EXISTS '$DB_USER'@'%' IDENTIFIED BY '$DB_PWD' ;" >> db1.sql
 	echo "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%';" >> db1.sql
-	echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '12345' ;" >> db1.sql
+	echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '$DB_ROOT_PWD' ;" >> db1.sql
 	echo "FLUSH PRIVILEGES;" >> db1.sql
 
 	mysqld --datadir=/var/lib/mysql --user=mysql &

@@ -8,8 +8,8 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/ngi
 
 echo "
 server {
-    listen 8070 ssl;
-    listen [::]:8070 ssl;
+    listen 443 ssl;
+    listen [::]:443 ssl;
 
     #server_name www.$DOMAIN_NAME $DOMAIN_NAME;
 
