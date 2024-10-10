@@ -27,7 +27,7 @@ if [ ! -d "/var/lib/mysql/$DB_NAME" ]; then
 	sleep 3
 	kill $(cat /run/mysqld/mysqld.pid)
 fi
-
+sleep 3
 # sleep infinity
 
 exec mysqld --datadir=/var/lib/mysql --user=mysql

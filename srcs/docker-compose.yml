@@ -6,7 +6,7 @@ volumes:
       # device: /home/jbidaux/data/wordpress
       # device: /home/jbidaux/Documents/inception/src/wordpress
       # device: /media/sf_inception/wordpress
-      device: /home/jeremie/wordpress
+      device: /home/jbidaux/wordpress
       o: bind
       type: none
   mariadb-data:
@@ -16,11 +16,9 @@ volumes:
       # device: /home/jbidaux/data/mariadb
       # device: /home/jbidaux/Documents/inception/src/mariadb
       # device: /media/sf_inception/mariadb
-      device: /home/jeremie/mariadb
+      device: /home/jbidaux/mariadb
       o: bind
       type: none
-
-#device: /home/jbidaux/data/mariadb
 
 networks:
   inception:
