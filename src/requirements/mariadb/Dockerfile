@@ -1,4 +1,4 @@
-FROM debian
+FROM debian:11
 
 RUN apt-get update -y && apt-get install mariadb-server -y
 
